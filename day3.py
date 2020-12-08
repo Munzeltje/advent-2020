@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import argparse
 import numpy as np
 
 class Map():
@@ -49,7 +50,7 @@ class Map():
             for j in range(width):
                 if lines[i][j] == '#':
                     self.map[i, j] = 1
-        self.width_map = width
+        self.width_map = width - 1              # -1 because of 0-based index
 
     def step(self):
         """Step once according to rules: 3 to the right, 1 down. Use modulo
@@ -61,9 +62,9 @@ class Map():
             No return value.
 
         """
-        self.current_i += 1
-        self.current_j += 3
-        self.current_j %= self.width_map - 1
+        self.current_i += args.step_i
+        self.current_j += args.step_j
+        self.current_j %= self.width_map
 
     def check_for_tree(self):
         """Check if there is a tree at current coordinates. If yes,
@@ -102,20 +103,30 @@ class Map():
         """
         print("Number of trees that are encountered:\t{}".format(self.number_of_trees_seen))
 
+def main():
+    file_name = "input.txt"
+    if not os.path.isfile(file_name):
+        raise ValueError("Given input file cannot be found.")
 
-file_name = "input.txt"
-if not os.path.isfile(file_name):
-    raise ValueError("Given input file cannot be found.")
+    file = open(file_name, "r")
+    contents = file.readlines()
+    file.close()
 
-file = open(file_name, "r")
-contents = file.readlines()
-file.close()
+    tree_map = Map()
+    tree_map.set_map(contents)
 
-tree_map = Map()
-tree_map.set_map(contents)
+    while not tree_map.is_done():
+        tree_map.step()
+        tree_map.check_for_tree()
 
-while not tree_map.is_done():
-    tree_map.step()
-    tree_map.check_for_tree()
+    tree_map.report_number_of_trees()
 
-tree_map.report_number_of_trees()
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-step_i", type=int, default=1,
+                        help="how many steps down for each move")
+    parser.add_argument("-step_j", type=int, default=3,
+                        help="how many steps right for each move")
+    args = parser.parse_args()
+    main()
