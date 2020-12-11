@@ -2,7 +2,6 @@
 
 import os
 import re
-import pdb; pdb.set_trace()
 
 class Passport():
     def __init__(self):
@@ -61,7 +60,7 @@ class Passport():
 
             elif key == "pid":
                 if value.isdigit():
-                    self.passport_id = int(value)
+                    self.passport_id = value
                 else:
                     self.valid = False
 
@@ -71,21 +70,38 @@ class Passport():
     def check_validity(self):
         if not self.valid:
             return False
+
         if self.birth_year is None or not 1920 <= self.birth_year <= 2002:
             return False
+
         if self.issue_year is None or not 2010 <= self.issue_year <= 2020:
             return False
+
         if self.expiration_year is None or not 2020 <= self.expiration_year <= 2030:
             return False
-        if self.height is None or (self.height[1] != "cm" and self.height != "in")
-                or not self.height[0].isdigit():
+
+        if (self.height is None or (self.height[1] != "cm" and self.height[1] != "in")
+                or not self.height[0].isdigit()):
             return False
-        if self.height[1] == "cm" and not 150 <= self.height[0] <= 193:
+        if self.height[1] == "cm" and not 150 <= int(self.height[0]) <= 193:
             return False
-        if self.height[1] == "in" and not 59 <= self.height <= 76:
+        if self.height[1] == "in" and not 59 <= int(self.height[0]) <= 76:
             return False
 
+        if self.hair_color is None or len(self.hair_color) != 6:
+            return False
+        valid_hair_color = re.compile(r'[^a-f0-9.]').search
+        if bool(valid_hair_color(self.hair_color)):
+            return False
 
+        valid_eye_color = ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"]
+        if self.eye_color is None or self.eye_color not in valid_eye_color:
+            return False
+
+        if self.passport_id is None or len(self.passport_id) != 9:
+            return False
+
+        return True
 
 file_name = "input.txt"
 if not os.path.isfile(file_name):
