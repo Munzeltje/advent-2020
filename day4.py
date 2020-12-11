@@ -4,6 +4,30 @@ import os
 import re
 
 class Passport():
+    """Passport object, used to check if given entries make up valid passports.
+
+    Attributes
+    ----------
+    birth_year : int
+        Number between 1920 and 2002.
+    issue_year : int
+        Number between 2010 and 2020.
+    expiration_year : int
+        Number between 2020 and 2030.
+    height : tuple
+        First element denotes height, second denotes metric (cm or in).
+    hair_color : string
+        A string constisting of a-f and/or 0-9.
+    eye_color : string
+        One of "amb", "blu", "brn", "gry", "grn", "hzl", "oth"
+    passport_id : string
+        String constisting of 0-9, must be of length 9.
+    country_id : string
+        Whatever value was givin.
+    valid : bool
+        If attribute does not pass check in set_values(), this is set to False.
+
+    """
     def __init__(self):
         self.birth_year = None
         self.issue_year = None
@@ -16,6 +40,20 @@ class Passport():
         self.valid = True
 
     def set_values(self, attributes):
+        """Takes a passport entry and sets values of Passport object. Performs
+        simple first check to see if passport might be invalid.
+
+        Parameters
+        ----------
+        attributes : string
+            Raw string extracted from input file denoting attribute values.
+
+        Returns
+        -------
+        None
+            No return value.
+
+        """
         attributes = attributes.replace(" ", "\n")
         attributes = attributes.split("\n")
         attributes = [attribute for attribute in attributes if attribute != ""]
@@ -68,6 +106,14 @@ class Passport():
                 self.country_id = value
 
     def check_validity(self):
+        """Elaborate check to see if Passport object is valid.
+
+        Returns
+        -------
+        bool
+            True if Passport is valid, False if not.
+
+        """
         if not self.valid:
             return False
 
