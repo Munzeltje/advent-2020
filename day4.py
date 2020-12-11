@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 import os
+import re
+import pdb; pdb.set_trace()
 
 class Passport():
     def __init__(self):
@@ -12,6 +14,7 @@ class Passport():
         self.eye_color = None
         self.passport_id = None
         self.country_id = None
+        self.valid = True
 
     def set_values(self, attributes):
         attributes = attributes.replace(" ", "\n")
@@ -22,29 +25,67 @@ class Passport():
             key = attribute[0]
             value = attribute[1]
             if key == "byr":
-                self.birth_year = value
+                if value.isdigit():
+                    self.birth_year = int(value)
+                else:
+                    self.valid = False
+
             elif key == "iyr":
-                self.issue_year = value
+                if value.isdigit():
+                    self.issue_year = int(value)
+                else:
+                    self.valid = False
+
             elif key == "eyr":
-                self.expiration_year = value
+                if value.isdigit():
+                    self.expiration_year = int(value)
+                else:
+                    self.valid = False
+
             elif key == "hgt":
-                self.height = value
+                new_value = re.findall(r'(\d+)(\w+)', value)[0]
+                if (len(new_value) == 2 and new_value[0].isdigit()
+                        and not new_value[1].isdigit()):
+                    self.height = new_value
+                else:
+                    self.valid = False
+
             elif key == "hcl":
-                self.hair_color = value
+                if value[0] == '#':
+                    self.hair_color = value[1:]
+                else:
+                    self.valid = False
+
             elif key == "ecl":
                 self.eye_color = value
+
             elif key == "pid":
-                self.passport_id = value
+                if value.isdigit():
+                    self.passport_id = int(value)
+                else:
+                    self.valid = False
+
             elif key == "cid":
                 self.country_id = value
 
     def check_validity(self):
-        if (self.birth_year is None or self.issue_year is None
-                or self.expiration_year is None or self.height is None
-                or self.hair_color is None or self.eye_color is None
-                or self.passport_id is None):
+        if not self.valid:
             return False
-        return True
+        if self.birth_year is None or not 1920 <= self.birth_year <= 2002:
+            return False
+        if self.issue_year is None or not 2010 <= self.issue_year <= 2020:
+            return False
+        if self.expiration_year is None or not 2020 <= self.expiration_year <= 2030:
+            return False
+        if self.height is None or (self.height[1] != "cm" and self.height != "in")
+                or not self.height[0].isdigit():
+            return False
+        if self.height[1] == "cm" and not 150 <= self.height[0] <= 193:
+            return False
+        if self.height[1] == "in" and not 59 <= self.height <= 76:
+            return False
+
+
 
 file_name = "input.txt"
 if not os.path.isfile(file_name):
