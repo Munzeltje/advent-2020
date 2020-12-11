@@ -13,6 +13,7 @@ contents = file.readlines()
 file.close()
 
 highest_id = 0
+id_list = []
 
 for line in contents:
     row_indication = line[:7]
@@ -39,8 +40,14 @@ for line in contents:
     col = max_col
 
     seat_id = row*8 + col
+    id_list.append(seat_id)
 
     if seat_id > highest_id:
         highest_id = seat_id
 
-print(highest_id)
+print("Highest seat ID:\t{}".format(highest_id))
+
+for number in range(818):
+    if number not in id_list:
+        if number - 1 in id_list and number + 1 in id_list:
+            print("Your seat ID:\t{}".format(number))
